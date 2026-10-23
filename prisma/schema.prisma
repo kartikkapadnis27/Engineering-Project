@@ -326,7 +326,7 @@ model Payment {
 }
 
 model MarketplaceSettings {
-  id String @id @default(auto()) @map("_id") @db.ObjectId @default("owner")
+  id String @id @default(auto()) @map("_id") @db.ObjectId
   ownerUpiQrUrl  String?
   ownerUpiId     String?
   updatedAt      DateTime @updatedAt
