@@ -6,7 +6,6 @@ if (!databaseUrl) {
   throw new Error('DATABASE_URL environment variable is missing.');
 }
 
-// MongoDB साठी सरळ आणि सोपा क्लायंट इनिशियलाइज करा (कोणताही SQLite चेक न ठेवता)
 export const prisma = new PrismaClient({
   datasources: {
     db: {
@@ -14,5 +13,16 @@ export const prisma = new PrismaClient({
     },
   },
 });
+
+// गायब झालेला connectDatabase फंक्शन परत जोडा
+export const connectDatabase = async () => {
+  try {
+    await prisma.$connect();
+    console.log('Successfully connected to MongoDB via Prisma!');
+  } catch (error) {
+    console.error('Failed to connect to MongoDB:', error);
+    process.exit(1);
+  }
+};
 
 export default prisma;
