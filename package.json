@@ -12,6 +12,8 @@
     "db:push": "npm --prefix server run db:push",
     "seed:owner": "npm --prefix server run seed:owner",
     "build:server": "npm --prefix server run build",
-    "build:client": "npm --prefix client run build"
+    "build:client": "npm --prefix client run build",
+    "build": "npm run build:client && npm run build:server",
+    "start": "npm --prefix server start"
   }
 }
