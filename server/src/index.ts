@@ -99,3 +99,19 @@ async function startServer() {
 }
 
 void startServer();
+
+import express from 'express';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// एक्सप्रेसला फ्रंटएंडचे dist फोल्डर वाचायला सांगा
+const clientDistPath = path.join(__dirname, '../../../client/dist');
+app.use(express.static(clientDistPath));
+
+// सर्व रोटेशन्स फ्रंटएंडच्या index.html कडे वळवा
+app.get('*', (req, res) => {
+  res.sendFile(path.join(clientDistPath, 'index.html'));
+});
