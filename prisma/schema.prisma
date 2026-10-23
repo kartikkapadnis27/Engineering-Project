@@ -9,7 +9,7 @@ datasource db {
 }
 
 model User {
-  id              String          @id @default(cuid())
+  id String @id @default(auto()) @map("_id") @db.ObjectId @default(auto()) @map("_id") @db.ObjectId
   name            String
   email           String          @unique
   passwordHash    String
@@ -40,13 +40,13 @@ model User {
 }
 
 model Role {
-  id        String   @id @default(cuid())
+  id String @id @default(auto()) @map("_id") @db.ObjectId @default(auto()) @map("_id") @db.ObjectId
   name      String   @unique
   createdAt DateTime @default(now())
 }
 
 model SellerProfile {
-  id              String        @id @default(cuid())
+  id String @id @default(auto()) @map("_id") @db.ObjectId @default(auto()) @map("_id") @db.ObjectId
   userId          String        @unique
   user            User          @relation(fields: [userId], references: [id])
   developerProfile String?
@@ -66,7 +66,7 @@ model SellerProfile {
 }
 
 model BuyerProfile {
-  id          String   @id @default(cuid())
+  id String @id @default(auto()) @map("_id") @db.ObjectId @default(auto()) @map("_id") @db.ObjectId
   userId      String   @unique
   user        User     @relation(fields: [userId], references: [id])
   phone       String?
@@ -76,7 +76,7 @@ model BuyerProfile {
 }
 
 model ProjectCategory {
-  id        String    @id @default(cuid())
+  id String @id @default(auto()) @map("_id") @db.ObjectId @default(auto()) @map("_id") @db.ObjectId
   name      String    @unique
   slug      String    @unique
   createdAt DateTime  @default(now())
@@ -84,14 +84,15 @@ model ProjectCategory {
 }
 
 model Technology {
-  id        String    @id @default(cuid())
+  id String @id @default(auto()) @map("_id") @db.ObjectId @default(auto()) @map("_id") @db.ObjectId
   name      String    @unique
   createdAt DateTime  @default(now())
-  projects  Project[] @relation("ProjectTechnologies")
+  projectIds String[] @db.ObjectId
+  projects Project[] @relation(fields: [projectIds], references: [id])
 }
 
 model Project {
-  id                String              @id @default(cuid())
+  id String @id @default(auto()) @map("_id") @db.ObjectId @default(auto()) @map("_id") @db.ObjectId
   title             String
   slug              String              @unique
   shortDescription  String
@@ -123,7 +124,8 @@ model Project {
   reviews           Review[]
   orderItems        OrderItem[]
   purchases         Purchase[]
-  technologies      Technology[]        @relation("ProjectTechnologies")
+  technologyIds String[] @db.ObjectId
+  technologies Technology[] @relation(fields: [technologyIds], references: [id])
   approval          ProjectApproval?
   versions          ProjectVersion[]
   comments          ProjectComment[]
@@ -136,7 +138,7 @@ model Project {
 }
 
 model ProjectImage {
-  id        String   @id @default(cuid())
+  id String @id @default(auto()) @map("_id") @db.ObjectId @default(auto()) @map("_id") @db.ObjectId
   projectId String
   project   Project  @relation(fields: [projectId], references: [id])
   url       String
@@ -144,7 +146,7 @@ model ProjectImage {
 }
 
 model ProjectFile {
-  id        String   @id @default(cuid())
+  id String @id @default(auto()) @map("_id") @db.ObjectId @default(auto()) @map("_id") @db.ObjectId
   projectId String
   project   Project  @relation(fields: [projectId], references: [id])
   fileName  String
@@ -157,7 +159,7 @@ model ProjectFile {
 }
 
 model ProjectLicense {
-  id        String   @id @default(cuid()) @unique
+  id String @id @default(auto()) @map("_id") @db.ObjectId @default(auto()) @map("_id") @db.ObjectId @unique
   projectId String   @unique
   project   Project  @relation(fields: [projectId], references: [id])
   type      String
@@ -166,7 +168,7 @@ model ProjectLicense {
 }
 
 model ProjectVersion {
-  id        String   @id @default(cuid())
+  id String @id @default(auto()) @map("_id") @db.ObjectId @default(auto()) @map("_id") @db.ObjectId
   projectId String
   project   Project  @relation(fields: [projectId], references: [id])
   version   String
@@ -183,7 +185,7 @@ model ProjectVersion {
 }
 
 model PriceAlert {
-  id        String   @id @default(cuid())
+  id String @id @default(auto()) @map("_id") @db.ObjectId @default(auto()) @map("_id") @db.ObjectId
   userId    String
   user      User     @relation(fields: [userId], references: [id])
   projectId String
@@ -194,7 +196,7 @@ model PriceAlert {
 }
 
 model ProjectMessage {
-  id        String   @id @default(cuid())
+  id String @id @default(auto()) @map("_id") @db.ObjectId @default(auto()) @map("_id") @db.ObjectId
   projectId String
   project   Project  @relation(fields: [projectId], references: [id])
   senderId  String
@@ -208,7 +210,7 @@ model ProjectMessage {
 }
 
 model InstitutionLicense {
-  id             String   @id @default(cuid())
+  id String @id @default(auto()) @map("_id") @db.ObjectId @default(auto()) @map("_id") @db.ObjectId
   code           String   @unique
   institutionName String
   categories     String   @default("[\"*\"]")
@@ -225,7 +227,7 @@ model InstitutionLicense {
 }
 
 model InstitutionMembership {
-  id        String   @id @default(cuid())
+  id String @id @default(auto()) @map("_id") @db.ObjectId @default(auto()) @map("_id") @db.ObjectId
   licenseId String
   license   InstitutionLicense @relation(fields: [licenseId], references: [id])
   userId    String
@@ -238,7 +240,7 @@ model InstitutionMembership {
 }
 
 model ProjectApproval {
-  id          String    @id @default(cuid())
+  id String @id @default(auto()) @map("_id") @db.ObjectId @default(auto()) @map("_id") @db.ObjectId
   projectId   String    @unique
   project     Project   @relation(fields: [projectId], references: [id])
   status      String    @default("PENDING_REVIEW")
@@ -249,7 +251,7 @@ model ProjectApproval {
 }
 
 model Cart {
-  id        String     @id @default(cuid())
+  id String @id @default(auto()) @map("_id") @db.ObjectId @default(auto()) @map("_id") @db.ObjectId
   userId    String
   user      User       @relation(fields: [userId], references: [id])
   items     CartItem[]
@@ -258,7 +260,7 @@ model Cart {
 }
 
 model CartItem {
-  id        String   @id @default(cuid())
+  id String @id @default(auto()) @map("_id") @db.ObjectId @default(auto()) @map("_id") @db.ObjectId
   cartId    String
   cart      Cart     @relation(fields: [cartId], references: [id])
   projectId String
@@ -267,7 +269,7 @@ model CartItem {
 }
 
 model Wishlist {
-  id        String   @id @default(cuid())
+  id String @id @default(auto()) @map("_id") @db.ObjectId @default(auto()) @map("_id") @db.ObjectId
   userId    String
   user      User     @relation(fields: [userId], references: [id])
   projectId String
@@ -275,7 +277,7 @@ model Wishlist {
 }
 
 model Order {
-  id             String      @id @default(cuid())
+  id String @id @default(auto()) @map("_id") @db.ObjectId @default(auto()) @map("_id") @db.ObjectId
   userId         String
   user           User        @relation(fields: [userId], references: [id])
   totalAmount    Int
@@ -289,7 +291,7 @@ model Order {
 }
 
 model OrderItem {
-  id        String   @id @default(cuid())
+  id String @id @default(auto()) @map("_id") @db.ObjectId @default(auto()) @map("_id") @db.ObjectId
   orderId   String
   order     Order    @relation(fields: [orderId], references: [id])
   projectId String
@@ -299,7 +301,7 @@ model OrderItem {
 }
 
 model Payment {
-  id                  String        @id @default(cuid())
+  id String @id @default(auto()) @map("_id") @db.ObjectId @default(auto()) @map("_id") @db.ObjectId
   orderId             String
   order               Order         @relation(fields: [orderId], references: [id])
   projectVersionId    String?
@@ -324,14 +326,14 @@ model Payment {
 }
 
 model MarketplaceSettings {
-  id             String   @id @default("owner")
+  id String @id @default(auto()) @map("_id") @db.ObjectId @default("owner")
   ownerUpiQrUrl  String?
   ownerUpiId     String?
   updatedAt      DateTime @updatedAt
 }
 
 model Coupon {
-  id              String   @id @default(cuid())
+  id String @id @default(auto()) @map("_id") @db.ObjectId @default(auto()) @map("_id") @db.ObjectId
   code            String   @unique
   discountPercent Int?
   discountAmount  Int?
@@ -342,7 +344,7 @@ model Coupon {
 }
 
 model ProjectComment {
-  id        String   @id @default(cuid())
+  id String @id @default(auto()) @map("_id") @db.ObjectId @default(auto()) @map("_id") @db.ObjectId
   projectId String
   project   Project  @relation(fields: [projectId], references: [id])
   userId    String
@@ -352,7 +354,7 @@ model ProjectComment {
 }
 
 model ProjectCustomizationRequest {
-  id          String   @id @default(cuid())
+  id String @id @default(auto()) @map("_id") @db.ObjectId @default(auto()) @map("_id") @db.ObjectId
   projectId   String
   project     Project  @relation(fields: [projectId], references: [id])
   userId      String
@@ -365,7 +367,7 @@ model ProjectCustomizationRequest {
 }
 
 model Purchase {
-  id          String    @id @default(cuid())
+  id String @id @default(auto()) @map("_id") @db.ObjectId @default(auto()) @map("_id") @db.ObjectId
   buyerId     String
   buyer       User      @relation(fields: [buyerId], references: [id])
   orderId     String
@@ -382,7 +384,7 @@ model Purchase {
 }
 
 model Download {
-  id         String    @id @default(cuid())
+  id String @id @default(auto()) @map("_id") @db.ObjectId @default(auto()) @map("_id") @db.ObjectId
   purchaseId String
   purchase   Purchase  @relation(fields: [purchaseId], references: [id])
   userId     String
@@ -391,7 +393,7 @@ model Download {
 }
 
 model Notification {
-  id        String   @id @default(cuid())
+  id String @id @default(auto()) @map("_id") @db.ObjectId @default(auto()) @map("_id") @db.ObjectId
   userId    String
   user      User     @relation(fields: [userId], references: [id])
   title     String
@@ -401,7 +403,7 @@ model Notification {
 }
 
 model AuditLog {
-  id        String   @id @default(cuid())
+  id String @id @default(auto()) @map("_id") @db.ObjectId @default(auto()) @map("_id") @db.ObjectId
   userId    String
   user      User     @relation(fields: [userId], references: [id])
   action    String
@@ -410,7 +412,7 @@ model AuditLog {
 }
 
 model SupportTicket {
-  id        String   @id @default(cuid())
+  id String @id @default(auto()) @map("_id") @db.ObjectId @default(auto()) @map("_id") @db.ObjectId
   userId    String
   user      User     @relation(fields: [userId], references: [id])
   subject   String
@@ -420,7 +422,7 @@ model SupportTicket {
 }
 
 model Review {
-  id        String   @id @default(cuid())
+  id String @id @default(auto()) @map("_id") @db.ObjectId @default(auto()) @map("_id") @db.ObjectId
   userId    String
   user      User     @relation(fields: [userId], references: [id])
   projectId String
@@ -431,7 +433,7 @@ model Review {
 }
 
 model SellerPayout {
-  id              String   @id @default(cuid())
+  id String @id @default(auto()) @map("_id") @db.ObjectId @default(auto()) @map("_id") @db.ObjectId
   sellerProfileId String
   sellerProfile   SellerProfile @relation(fields: [sellerProfileId], references: [id])
   paymentId       String?  @unique
@@ -444,7 +446,7 @@ model SellerPayout {
 }
 
 model Commission {
-  id          String   @id @default(cuid())
+  id String @id @default(auto()) @map("_id") @db.ObjectId @default(auto()) @map("_id") @db.ObjectId
   orderId     String
   grossAmount Int
   rate        Float
@@ -454,7 +456,7 @@ model Commission {
 }
 
 model CustomSoftwareRequest {
-  id String @id @default(auto()) @map("_id") @db.ObjectId
+  id String @id @default(auto()) @map("_id") @db.ObjectId @default(auto()) @map("_id") @db.ObjectId
   name        String
   email       String
   phone       String?
