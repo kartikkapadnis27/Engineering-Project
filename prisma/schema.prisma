@@ -4,7 +4,7 @@ generator client {
 }
 
 datasource db {
-  provider = "mangodb"
+  provider = "mongodb"
   url      = env("mongodb+srv://kartikkapadnis27:<Krutikak@27>@cluster0.3fkhkto.mongodb.net/")
 }
 
