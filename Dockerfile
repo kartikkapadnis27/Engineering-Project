@@ -1,6 +1,9 @@
 FROM node:20-alpine AS builder
 WORKDIR /app
 
+# Alpine मध्ये Prisma साठी लागणारी OpenSSL 1.1.x लायब्ररी इन्स्टॉल करा
+RUN apk add --no-cache openssl1.1-compat
+
 # मुख्य आणि उप-फोल्डर्सच्या पॅकेज फाइल्स कॉपी करा
 COPY package*.json ./
 COPY client/package*.json ./client/
