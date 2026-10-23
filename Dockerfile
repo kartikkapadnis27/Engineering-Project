@@ -14,6 +14,9 @@ RUN npm --prefix server install
 # सर्व प्रोजेक्ट कोड कॉपी करा
 COPY . .
 
+# एरर टाळण्यासाठी सिस्टीममध्ये एक रिकामी .env फाईल आधीच तयार करा
+RUN touch .env
+
 # डेटाबेस मॉडेल आणि फ्रंटएंड/बॅकएंड बिल्ड करा
 RUN npm run db:generate
 RUN npm run build
