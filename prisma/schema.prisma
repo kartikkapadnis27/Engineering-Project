@@ -1,0 +1,467 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../server/node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id              String          @id @default(cuid())
+  name            String
+  email           String          @unique
+  passwordHash    String
+  role            String
+  status          String          @default("ACTIVE")
+  phone           String?
+  collegeOrg      String?
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  sellerProfile   SellerProfile?
+  buyerProfile    BuyerProfile?
+  carts           Cart[]
+  wishlists       Wishlist[]
+  notifications   Notification[]
+  auditLogs       AuditLog[]
+  supportTickets  SupportTicket[]
+  orders          Order[]
+  purchases       Purchase[]
+  reviews         Review[]
+  downloads       Download[]
+  projectComments ProjectComment[]
+  customizationRequests ProjectCustomizationRequest[]
+  priceAlerts     PriceAlert[]
+  sentMessages    ProjectMessage[] @relation("ProjectMessageSender")
+  buyerMessages   ProjectMessage[] @relation("ProjectMessageBuyer")
+  institutionLicenses InstitutionLicense[] @relation("InstitutionLicenseCreator")
+  institutionMemberships InstitutionMembership[]
+}
+
+model Role {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
+}
+
+model SellerProfile {
+  id              String        @id @default(cuid())
+  userId          String        @unique
+  user            User          @relation(fields: [userId], references: [id])
+  developerProfile String?
+  skills          String
+  experience      String?
+  portfolio       String?
+  paymentInfo     String?
+  developerUpiQrUrl String?
+  whatsappNumber  String?
+  status          String        @default("PENDING_VERIFICATION")
+  balance         Int           @default(0)
+  totalEarnings   Int           @default(0)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  projects        Project[]
+  payouts         SellerPayout[]
+}
+
+model BuyerProfile {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  user        User     @relation(fields: [userId], references: [id])
+  phone       String?
+  collegeOrg  String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model ProjectCategory {
+  id        String    @id @default(cuid())
+  name      String    @unique
+  slug      String    @unique
+  createdAt DateTime  @default(now())
+  projects  Project[]
+}
+
+model Technology {
+  id        String    @id @default(cuid())
+  name      String    @unique
+  createdAt DateTime  @default(now())
+  projects  Project[] @relation("ProjectTechnologies")
+}
+
+model Project {
+  id                String              @id @default(cuid())
+  title             String
+  slug              String              @unique
+  shortDescription  String
+  fullDescription   String
+  categoryId        String
+  category          ProjectCategory     @relation(fields: [categoryId], references: [id])
+  sellerId          String
+  seller            SellerProfile       @relation(fields: [sellerId], references: [id])
+  status            String              @default("PENDING_REVIEW")
+  projectStatus     String              @default("Pending")
+  price             Int
+  developerAgreedPrice Int?
+  studentRetailPrice Int?
+  integrityScore    Int                 @default(0)
+  codeMarketAssured Boolean             @default(false)
+  discount          Int?
+  rating            Float               @default(0)
+  reviewCount       Int                 @default(0)
+  demoUrl           String?
+  thumbnail         String?
+  demoVideo         String?
+  version           String?
+  tags              String
+  uploadedAt        DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  projectImages     ProjectImage[]
+  projectFiles      ProjectFile[]
+  license           ProjectLicense?
+  reviews           Review[]
+  orderItems        OrderItem[]
+  purchases         Purchase[]
+  technologies      Technology[]        @relation("ProjectTechnologies")
+  approval          ProjectApproval?
+  versions          ProjectVersion[]
+  comments          ProjectComment[]
+  customizationRequests ProjectCustomizationRequest[]
+  priceAlerts       PriceAlert[]
+  messages          ProjectMessage[]
+  sourceAnalysis    String?
+  sourceFingerprint String?
+  duplicateSourceCount Int              @default(0)
+}
+
+model ProjectImage {
+  id        String   @id @default(cuid())
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id])
+  url       String
+  createdAt DateTime @default(now())
+}
+
+model ProjectFile {
+  id        String   @id @default(cuid())
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id])
+  fileName  String
+  storageKey String
+  mimeType  String
+  size      Int
+  versionId String?
+  version   ProjectVersion? @relation(fields: [versionId], references: [id])
+  createdAt DateTime @default(now())
+}
+
+model ProjectLicense {
+  id        String   @id @default(cuid()) @unique
+  projectId String   @unique
+  project   Project  @relation(fields: [projectId], references: [id])
+  type      String
+  text      String
+  createdAt DateTime @default(now())
+}
+
+model ProjectVersion {
+  id        String   @id @default(cuid())
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id])
+  version   String
+  notes     String?
+  status    String   @default("PENDING_REVIEW")
+  reviewNote String?
+  paidUpdate Boolean @default(false)
+  updatePrice Int?
+  developerAgreedPrice Int?
+  createdAt DateTime @default(now())
+  files     ProjectFile[]
+  payments  Payment[]
+  purchases Purchase[]
+}
+
+model PriceAlert {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id])
+  createdAt DateTime @default(now())
+
+  @@unique([userId, projectId])
+}
+
+model ProjectMessage {
+  id        String   @id @default(cuid())
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id])
+  senderId  String
+  sender    User     @relation("ProjectMessageSender", fields: [senderId], references: [id])
+  buyerId   String
+  buyer     User     @relation("ProjectMessageBuyer", fields: [buyerId], references: [id])
+  content   String
+  createdAt DateTime @default(now())
+
+  @@index([projectId, buyerId, createdAt])
+}
+
+model InstitutionLicense {
+  id             String   @id @default(cuid())
+  code           String   @unique
+  institutionName String
+  categories     String   @default("[\"*\"]")
+  maxSeats       Int
+  claimedSeats   Int      @default(0)
+  annualPrice    Int
+  paymentReference String
+  expiresAt      DateTime
+  status         String   @default("ACTIVE")
+  createdById    String
+  createdBy      User     @relation("InstitutionLicenseCreator", fields: [createdById], references: [id])
+  memberships    InstitutionMembership[]
+  createdAt      DateTime @default(now())
+}
+
+model InstitutionMembership {
+  id        String   @id @default(cuid())
+  licenseId String
+  license   InstitutionLicense @relation(fields: [licenseId], references: [id])
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  status    String   @default("ACTIVE")
+  createdAt DateTime @default(now())
+
+  @@unique([licenseId, userId])
+  @@index([userId, status])
+}
+
+model ProjectApproval {
+  id          String    @id @default(cuid())
+  projectId   String    @unique
+  project     Project   @relation(fields: [projectId], references: [id])
+  status      String    @default("PENDING_REVIEW")
+  reviewedBy  String?
+  reviewNote  String?
+  reviewedAt DateTime?
+  createdAt   DateTime   @default(now())
+}
+
+model Cart {
+  id        String     @id @default(cuid())
+  userId    String
+  user      User       @relation(fields: [userId], references: [id])
+  items     CartItem[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model CartItem {
+  id        String   @id @default(cuid())
+  cartId    String
+  cart      Cart     @relation(fields: [cartId], references: [id])
+  projectId String
+  quantity  Int      @default(1)
+  createdAt DateTime @default(now())
+}
+
+model Wishlist {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  projectId String
+  createdAt DateTime @default(now())
+}
+
+model Order {
+  id             String      @id @default(cuid())
+  userId         String
+  user           User        @relation(fields: [userId], references: [id])
+  totalAmount    Int
+  couponCode     String?
+  status         String      @default("PENDING")
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+  orderItems     OrderItem[]
+  payments       Payment[]
+  purchases      Purchase[]
+}
+
+model OrderItem {
+  id        String   @id @default(cuid())
+  orderId   String
+  order     Order    @relation(fields: [orderId], references: [id])
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id])
+  price     Int
+  quantity  Int      @default(1)
+}
+
+model Payment {
+  id                  String        @id @default(cuid())
+  orderId             String
+  order               Order         @relation(fields: [orderId], references: [id])
+  projectVersionId    String?
+  projectVersion      ProjectVersion? @relation(fields: [projectVersionId], references: [id])
+  provider            String        @default("manual-upi")
+  utrNumber           String?       @unique
+  paymentScreenshotUrl String?
+  paymentVerificationState String   @default("NOT_SUBMITTED")
+  paymentReviewNote    String?
+  escrowLockStatus    String        @default("NOT_LOCKED")
+  verifiedAt          DateTime?
+  escrowReleaseAt     DateTime?
+  sellerPayout        SellerPayout?
+  providerOrderId     String?       @unique
+  providerPaymentId   String?
+  amount              Int
+  currency            String        @default("INR")
+  status              String        @default("PENDING")
+  signatureVerified   Boolean       @default(false)
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+}
+
+model MarketplaceSettings {
+  id             String   @id @default("owner")
+  ownerUpiQrUrl  String?
+  ownerUpiId     String?
+  updatedAt      DateTime @updatedAt
+}
+
+model Coupon {
+  id              String   @id @default(cuid())
+  code            String   @unique
+  discountPercent Int?
+  discountAmount  Int?
+  active          Boolean  @default(true)
+  expiresAt       DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model ProjectComment {
+  id        String   @id @default(cuid())
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id])
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  comment   String
+  createdAt DateTime @default(now())
+}
+
+model ProjectCustomizationRequest {
+  id          String   @id @default(cuid())
+  projectId   String
+  project     Project  @relation(fields: [projectId], references: [id])
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  description String
+  budget      String?
+  timeline    String?
+  status      String   @default("NEW")
+  createdAt   DateTime @default(now())
+}
+
+model Purchase {
+  id          String    @id @default(cuid())
+  buyerId     String
+  buyer       User      @relation(fields: [buyerId], references: [id])
+  orderId     String
+  order       Order     @relation(fields: [orderId], references: [id])
+  projectId   String
+  project     Project   @relation(fields: [projectId], references: [id])
+  projectVersionId String?
+  projectVersion ProjectVersion? @relation(fields: [projectVersionId], references: [id])
+  activationCode String? @unique
+  paidAmount  Int
+  accessUntil DateTime?
+  createdAt   DateTime  @default(now())
+  downloads   Download[]
+}
+
+model Download {
+  id         String    @id @default(cuid())
+  purchaseId String
+  purchase   Purchase  @relation(fields: [purchaseId], references: [id])
+  userId     String
+  user       User      @relation(fields: [userId], references: [id])
+  downloadedAt DateTime @default(now())
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  title     String
+  message   String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  action    String
+  details   String
+  createdAt DateTime @default(now())
+}
+
+model SupportTicket {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  subject   String
+  message   String
+  status    String   @default("OPEN")
+  createdAt DateTime @default(now())
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id])
+  rating    Int
+  comment   String?
+  createdAt DateTime @default(now())
+}
+
+model SellerPayout {
+  id              String   @id @default(cuid())
+  sellerProfileId String
+  sellerProfile   SellerProfile @relation(fields: [sellerProfileId], references: [id])
+  paymentId       String?  @unique
+  payment         Payment? @relation(fields: [paymentId], references: [id])
+  amount          Int
+  status          String   @default("PENDING")
+  transferReference String?
+  processedAt     DateTime?
+  createdAt       DateTime @default(now())
+}
+
+model Commission {
+  id          String   @id @default(cuid())
+  orderId     String
+  grossAmount Int
+  rate        Float
+  platformFee Int
+  sellerShare Int
+  createdAt   DateTime @default(now())
+}
+
+model CustomSoftwareRequest {
+  id          String   @id @default(cuid())
+  name        String
+  email       String
+  phone       String?
+  projectType String
+  description String
+  budget      String?
+  timeline    String?
+  status      String   @default("NEW")
+  createdAt   DateTime @default(now())
+}

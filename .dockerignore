@@ -1,0 +1,12 @@
+.git
+.env
+.env.*
+!.env.production.example
+**/node_modules
+**/dist
+**/coverage
+**/dev.db
+**/dev.db-*
+**/uploads
+**/.DS_Store
+**/npm-debug.log*

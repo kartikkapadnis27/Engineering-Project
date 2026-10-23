@@ -1,0 +1,13 @@
+.env
+.env.*
+!.env.example
+!.env.production.example
+**/node_modules/
+**/dist/
+**/coverage/
+**/uploads/
+**/*.db
+**/*.db-*
+**/*.sqlite
+**/*.sqlite-*
+**/npm-debug.log*
