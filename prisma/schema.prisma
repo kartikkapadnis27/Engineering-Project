@@ -454,7 +454,7 @@ model Commission {
 }
 
 model CustomSoftwareRequest {
-  id          String   @id @default(cuid())
+  id String @id @default(auto()) @map("_id") @db.ObjectId
   name        String
   email       String
   phone       String?
