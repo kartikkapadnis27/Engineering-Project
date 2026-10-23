@@ -4,8 +4,8 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  provider = "mangodb"
+  url      = env("mongodb+srv://kartikkapadnis27:<Krutikak@27>@cluster0.3fkhkto.mongodb.net/")
 }
 
 model User {
